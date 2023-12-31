@@ -5,7 +5,7 @@ import { Language } from "consts/enums"
 import { FC, KeyboardEvent, useCallback, useState } from "react"
 
 interface Props {
-    saveWord: (v: string) => void
+    saveWord: (text: string) => Promise<void>
 }
 
 const SearchBar: FC<Props> = ({ saveWord }) => {
@@ -34,18 +34,22 @@ const SearchBar: FC<Props> = ({ saveWord }) => {
         [loading, setSearch, setWords]
     )
 
-    const onChange = useCallback((v: string | null) => {
-        if (!v) return
-        
-        saveWord(v)
-        setSearch('')
-        setWords([])
-    }, [setWords, setSearch, saveWord])
+    const onChange = useCallback(
+        (v: string | null) => {
+            if (!v) return
 
+            saveWord(v)
+            setSearch("")
+            setWords([])
+        },
+        [setWords, setSearch, saveWord]
+    )
+
+    // Built-in select filtering is disabled. It's handled by changing `data` value.
     return (
         <Select
             data={words}
-            value=''
+            value=""
             onChange={onChange}
             searchValue={search}
             onSearchChange={onSearchChange}
@@ -53,6 +57,7 @@ const SearchBar: FC<Props> = ({ saveWord }) => {
             leftSection={loading ? <Loader size={18} /> : <IconSearch size={20} />}
             rightSection={<Kbd size="xs">Enter</Kbd>}
             rightSectionWidth={65}
+            filter={v => v.options}
             searchable
         />
     )
