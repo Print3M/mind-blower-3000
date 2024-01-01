@@ -13,8 +13,6 @@ def get_html_source(lang: Language, word: str):
     url = f"{COOLJUGATOR_WEB_ROOT}/{lang.value}/{word}"
     resp = requests.get(url, headers={"User-Agent": get_user_agent()})
 
-    print(resp.request.headers)
-
     if resp.status_code != 200:
         raise AssertionError(
             f"Something went wrong while requesting Cooljugator website: {url}"

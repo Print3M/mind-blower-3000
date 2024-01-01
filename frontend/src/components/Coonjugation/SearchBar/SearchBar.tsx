@@ -1,14 +1,12 @@
-import { Kbd, Loader, Select } from "@mantine/core"
+import { Box, Kbd, Loader, Select } from "@mantine/core"
 import { IconSearch } from "@tabler/icons-react"
 import { getConjugationSearch } from "api/conjugation"
 import { Language } from "consts/enums"
-import { FC, KeyboardEvent, useCallback, useState } from "react"
+import { KeyboardEvent, useCallback, useState } from "react"
+import { useGameCtx } from "../context"
 
-interface Props {
-    saveWord: (text: string) => Promise<void>
-}
-
-const SearchBar: FC<Props> = ({ saveWord }) => {
+const SearchBar = () => {
+    const ctx = useGameCtx()
     const [words, setWords] = useState<string[]>([])
     const [search, setSearch] = useState("")
     const [loading, setLoading] = useState(false)
@@ -38,28 +36,32 @@ const SearchBar: FC<Props> = ({ saveWord }) => {
         (v: string | null) => {
             if (!v) return
 
-            saveWord(v)
             setSearch("")
+            ctx.fn.words.save(v)
             setWords([])
         },
-        [setWords, setSearch, saveWord]
+        [setWords, setSearch, ctx.fn.words.save]
     )
 
     // Built-in select filtering is disabled. It's handled by changing `data` value.
     return (
-        <Select
-            data={words}
-            value=""
-            onChange={onChange}
-            searchValue={search}
-            onSearchChange={onSearchChange}
-            onKeyDown={onKeyDown}
-            leftSection={loading ? <Loader size={18} /> : <IconSearch size={20} />}
-            rightSection={<Kbd size="xs">Enter</Kbd>}
-            rightSectionWidth={65}
-            filter={v => v.options}
-            searchable
-        />
+        <Box w={350} m="auto">
+            <Select
+                data={words}
+                value=""
+                onChange={onChange}
+                searchValue={search}
+                onSearchChange={onSearchChange}
+                onKeyDown={onKeyDown}
+                leftSection={loading ? <Loader size={18} /> : <IconSearch size={20} />}
+                rightSection={<Kbd size="xs">Enter</Kbd>}
+                rightSectionWidth={65}
+                filter={v => v.options}
+                searchable
+                disabled={ctx.data.state != "setup"}
+                label="Macedonian word"
+            />
+        </Box>
     )
 }
 
